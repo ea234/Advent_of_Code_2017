@@ -117,7 +117,7 @@ public class Day04_HighEntropyPassphrases
       {
         String idx2_value = converted_string_list.get( idx2 );
 
-        if ( checkAnagram( idx1_value, idx2_value, pKnzDebug ) == 1 )
+        if ( checkAnagram( idx1_value, idx2_value, pKnzDebug ) )
         {
           return 0;
         }
@@ -127,27 +127,30 @@ public class Day04_HighEntropyPassphrases
     return 1;
   }
 
-  private static int checkAnagram( String pInputA, String pInputB, boolean pKnzDebug )
+  private static boolean checkAnagram( String pInputA, String pInputB, boolean pKnzDebug )
   {
-    long check_sum_a = 0;
-    long check_sum_b = 0;
-
-    for ( int idx = 0; idx < pInputA.length(); idx++ )
+    /*
+     * Different Length = no Anagram
+     */
+    if ( pInputA.length() != pInputB.length() )
     {
-      check_sum_a += ( (int) pInputA.charAt( idx ) ) - 48;
+      return false;
     }
 
-    for ( int idx = 0; idx < pInputB.length(); idx++ )
+    char[] arr1 = pInputA.toCharArray();
+    char[] arr2 = pInputB.toCharArray();
+
+    Arrays.sort( arr1 );
+    Arrays.sort( arr2 );
+
+    boolean knz_is_anagram = Arrays.equals( arr1, arr2 );
+
+    if ( ( pKnzDebug ) || knz_is_anagram )
     {
-      check_sum_b += ( (int) pInputB.charAt( idx ) ) - 48;
+      wl( String.format( "A = \"%-12s\"   B = \"%-12s\" IsAnagramm " + knz_is_anagram, pInputA, pInputB ) );
     }
 
-    if ( ( pKnzDebug ) || ( check_sum_a == check_sum_b ) )
-    {
-      wl( String.format( "A = \"%-20s\"   B = \"%-20s\"   ChecksumA %7d   ChecksumB %7d   IsAnagramm " + ( check_sum_a == check_sum_b ), pInputA, pInputB, check_sum_a, check_sum_b ) );
-    }
-
-    return ( check_sum_a == check_sum_b ? 1 : 0 );
+    return knz_is_anagram;
   }
 
   private static List< String > getListProd()
