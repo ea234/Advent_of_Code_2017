@@ -15,22 +15,30 @@ import java.util.List;
  * 
  * https://www.reddit.com/r/adventofcode/comments/7iksqc/2017_day_9_solutions/
  * 
- * Input {}                               group_count   1  group_score_val      1 
- * Input {{{}}}                           group_count   3  group_score_val      6 
- * Input {{},{}}                          group_count   3  group_score_val      5 
- * Input {{{},{},{{}}}}                   group_count   6  group_score_val     16 
- * Input {<{},{},{{}}>}                   group_count   1  group_score_val      1 
- * Input {<a>,<a>,<a>,<a>}                group_count   1  group_score_val      1 
- * Input {{<a>},{<a>},{<a>},{<a>}}        group_count   5  group_score_val      9 
- * Input {{<!>},{<!>},{<!>},{<a>}}        group_count   2  group_score_val      3 
- * Input {{<ab>},{<ab>},{<ab>},{<ab>}}    group_count   5  group_score_val      9 
- * Input {{<!!>},{<!!>},{<!!>},{<!!>}}    group_count   5  group_score_val      9 
- * Input {{<a!>},{<a!>},{<a!>},{<ab>}}    group_count   2  group_score_val      3 
+ * Input {<>}                                  group_count    1  group_score_val      1   garbage_characters      0
+ * Input {<{!>}>}                              group_count    1  group_score_val      1   garbage_characters      2
+ * Input {<!!>}                                group_count    1  group_score_val      1   garbage_characters      0
+ * Input {<!!!>>}                              group_count    1  group_score_val      1   garbage_characters      0
+ * Input {<<<<>}                               group_count    1  group_score_val      1   garbage_characters      3
+ * Input {<{!>}>}                              group_count    1  group_score_val      1   garbage_characters      2
+ * Input {<random characters>}                 group_count    1  group_score_val      1   garbage_characters     17
+ * Input {<{o"i!a,<{i<a>}                      group_count    1  group_score_val      1   garbage_characters     10
+ * Input {}                                    group_count    1  group_score_val      1   garbage_characters      0
+ * Input {{{}}}                                group_count    3  group_score_val      6   garbage_characters      0
+ * Input {{},{}}                               group_count    3  group_score_val      5   garbage_characters      0
+ * Input {{{},{},{{}}}}                        group_count    6  group_score_val     16   garbage_characters      0
+ * Input {<{},{},{{}}>}                        group_count    1  group_score_val      1   garbage_characters     10
+ * Input {<a>,<a>,<a>,<a>}                     group_count    1  group_score_val      1   garbage_characters      4
+ * Input {{<a>},{<a>},{<a>},{<a>}}             group_count    5  group_score_val      9   garbage_characters      4
+ * Input {{<!>},{<!>},{<!>},{<a>}}             group_count    2  group_score_val      3   garbage_characters     13
+ * Input {{<ab>},{<ab>},{<ab>},{<ab>}}         group_count    5  group_score_val      9   garbage_characters      8
+ * Input {{<!!>},{<!!>},{<!!>},{<!!>}}         group_count    5  group_score_val      9   garbage_characters      0
+ * Input {{<a!>},{<a!>},{<a!>},{<ab>}}         group_count    2  group_score_val      3   garbage_characters     17
+ * Input {{{{{{{{<a}!!!aa!!!>ua,a,!>{!>!!!>    group_count 1290  group_score_val  11089   garbage_characters   5288
  * 
- * Input {{{{{{{{<a}!!!aa!!!>ua,a,!>{!>!!!>a>,<!>,!!!!,!!!"!,!a!   group_count 1290  group_score_val  11089
- * 
- * group_score_val    11089
- * garbage_characters 5288
+ * Result Part 1 11089
+ * Result Part 2 5288
+ *
  * 
  * {{<ab>},{<ab>},{<ab>},{<ab>}}
  * cur_index     0   cur_char {   group_count    0   group_sorce_cur    0   knz_in_garbage    0   score      0 
@@ -99,6 +107,14 @@ public class Day09_StreamProcessing
 {
   public static void main( String[] args )
   {
+    parseStream( "{<>}",                          true );
+    parseStream( "{<{!>}>}",                      true );
+    parseStream( "{<!!>}",                        true );
+    parseStream( "{<!!!>>}",                      true );
+    parseStream( "{<<<<>}",                       true );
+    parseStream( "{<{!>}>}",                      true );
+    parseStream( "{<random characters>}",         true );
+    parseStream( "{<{o\"i!a,<{i<a>}",             true );
     parseStream( "{}",                            true );
     parseStream( "{{{}}}",                        true );
     parseStream( "{{},{}}",                       true );
@@ -110,46 +126,15 @@ public class Day09_StreamProcessing
     parseStream( "{{<ab>},{<ab>},{<ab>},{<ab>}}", true );
     parseStream( "{{<!!>},{<!!>},{<!!>},{<!!>}}", true );
     parseStream( "{{<a!>},{<a!>},{<a!>},{<ab>}}", true );
-    parseStream( "{<>}",                          true );
-    parseStream( "{<{!>}>}",                      true );
-    parseStream( "{<!!>}",                        true );
-    parseStream( "{<!!!>>}",                      true );
-    parseStream( "{<<<<>}",                       true );
-    parseStream( "{<{!>}>}",                      true );
-    parseStream( "{<random characters>}",         true );
-    parseStream( "{<{o\"i!a,<{i<a>}",             true );
 
-    calculate01( getListProd(), true );
+    parseStream( getListProd(),                   true );
 
     System.exit( 0 );
   }
 
-  private static void calculate01( List< String > pListInput, boolean pKnzDebug )
-  {
-    int result_part_01 = 0;
-
-    int result_part_02 = 0;
-
-    for ( String input_str : pListInput )
-    {
-      if ( !input_str.isBlank() )
-      {
-        result_part_01 += parseStream( input_str, pKnzDebug );
-      }
-    }
-
-    wl( "" );
-    wl( "Result Part 1 " + result_part_01 );
-    wl( "Result Part 2 " + result_part_02 );
-    wl( "" );
-    wl( "" );
-  }
-
-  private static long parseStream( String pInput, boolean pKnzDebug )
+  private static void parseStream( String pInput, boolean pKnzDebug )
   {
     long knz_in_garbage     = 0;
-
-    long garbage_count      = 0;
 
     long garbage_characters = 0;
 
@@ -216,25 +201,24 @@ public class Day09_StreamProcessing
 
     if ( pKnzDebug )
     {
-      wl( String.format( "Input %-30s   group_count %3d  group_score_val %6d   garbage_count %6d", pInput.substring( 0, Math.min( 55, pInput.length() ) ), group_count, group_score_val, garbage_count ) );
+      wl( String.format( "Input %-35s   group_count %4d  group_score_val %6d   garbage_characters %6d", pInput.substring( 0, Math.min( 34, pInput.length() ) ), group_count, group_score_val, garbage_characters ) );
     }
 
     wl( "" );
-    wl( "group_score_val    " + group_score_val );
-    wl( "garbage_characters " + garbage_characters );
-
-    return group_score_val;
+    wl( "Result Part 1 " + group_score_val );
+    wl( "Result Part 2 " + garbage_characters );
+    wl( "" );
   }
 
-  private static List< String > getListProd()
+  private static String getListProd()
   {
-    List< String > string_array = null;
+    String string_array = null;
 
     String datei_input = "/mnt/hd4tbb/daten/zdownload/advent_of_code_2017__day09_input.txt";
 
     try
     {
-      string_array = Files.readAllLines( Path.of( datei_input ) );
+      string_array = Files.readString( Path.of( datei_input ) );
     }
     catch ( IOException e )
     {
