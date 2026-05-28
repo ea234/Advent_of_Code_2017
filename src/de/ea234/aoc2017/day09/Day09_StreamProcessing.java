@@ -1,5 +1,8 @@
 package de.ea234.aoc2017.day09;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,8 +27,10 @@ import java.util.List;
  * Input {{<!!>},{<!!>},{<!!>},{<!!>}}    group_count   5  group_score_val      9 
  * Input {{<a!>},{<a!>},{<a!>},{<ab>}}    group_count   2  group_score_val      3 
  * 
- * Result Part 1 1290
- * Result Part 2 0
+ * Input {{{{{{{{<a}!!!aa!!!>ua,a,!>{!>!!!>a>,<!>,!!!!,!!!"!,!a!   group_count 1290  group_score_val  11089
+ * 
+ * group_score_val    11089
+ * garbage_characters 5288
  * 
  * {{<ab>},{<ab>},{<ab>},{<ab>}}
  * cur_index     0   cur_char {   group_count    0   group_sorce_cur    0   knz_in_garbage    0   score      0 
@@ -105,8 +110,16 @@ public class Day09_StreamProcessing
     parseStream( "{{<ab>},{<ab>},{<ab>},{<ab>}}", true );
     parseStream( "{{<!!>},{<!!>},{<!!>},{<!!>}}", true );
     parseStream( "{{<a!>},{<a!>},{<a!>},{<ab>}}", true );
+    parseStream( "{<>}",                          true );
+    parseStream( "{<{!>}>}",                      true );
+    parseStream( "{<!!>}",                        true );
+    parseStream( "{<!!!>>}",                      true );
+    parseStream( "{<<<<>}",                       true );
+    parseStream( "{<{!>}>}",                      true );
+    parseStream( "{<random characters>}",         true );
+    parseStream( "{<{o\"i!a,<{i<a>}",             true );
 
-    calculate01( getListProd(), false );
+    calculate01( getListProd(), true );
 
     System.exit( 0 );
   }
@@ -134,13 +147,17 @@ public class Day09_StreamProcessing
 
   private static long parseStream( String pInput, boolean pKnzDebug )
   {
-    long knz_in_garbage = 0;
+    long knz_in_garbage     = 0;
 
-    long group_score_cur = 0;
+    long garbage_count      = 0;
 
-    long group_score_val = 0;
+    long garbage_characters = 0;
 
-    long group_count = 0;
+    long group_score_cur    = 0;
+
+    long group_score_val    = 0;
+
+    long group_count        = 0;
 
     for ( int cur_index = 0; cur_index < pInput.length(); cur_index++ )
     {
@@ -164,17 +181,23 @@ public class Day09_StreamProcessing
         else if ( cur_char == '>' )
         {
           /*
-           * If the cur_char is '>', the level of the garbage brackets 
-           * is decremented by one
+           * If the cur_char is '>', the parser is no longer in garbage 
            */
-          knz_in_garbage--;
+          knz_in_garbage = 0;
+        }
+        else
+        {
+          /*
+           * Count the garbage Characters
+           */
+          garbage_characters++;
         }
       }
       else
       {
         if ( cur_char == '<' )
         {
-          knz_in_garbage++;
+          knz_in_garbage = 1;
         }
         else if ( cur_char == '{' )
         {
@@ -193,10 +216,14 @@ public class Day09_StreamProcessing
 
     if ( pKnzDebug )
     {
-      wl( String.format( "Input %-30s   group_count %3d  group_score_val %6d ", pInput, group_count, group_score_val ) );
+      wl( String.format( "Input %-30s   group_count %3d  group_score_val %6d   garbage_count %6d", pInput.substring( 0, Math.min( 55, pInput.length() ) ), group_count, group_score_val, garbage_count ) );
     }
 
-    return group_count;
+    wl( "" );
+    wl( "group_score_val    " + group_score_val );
+    wl( "garbage_characters " + garbage_characters );
+
+    return group_score_val;
   }
 
   private static List< String > getListProd()
