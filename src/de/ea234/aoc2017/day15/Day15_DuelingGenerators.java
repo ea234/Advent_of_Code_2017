@@ -102,20 +102,12 @@ public class Day15_DuelingGenerators
       old_value_a = ( old_value_a * pGeneratorAFactor ) % pRemainderDiv;
       old_value_b = ( old_value_b * pGeneratorBFactor ) % pRemainderDiv;
 
-      if ( ( ( old_value_a % 4 ) == 0 ) && ( ( old_value_b % 8 ) == 0 ) )
-      {
-        bits_16_a = old_value_a & bit_mask;
-        bits_16_b = old_value_b & bit_mask;
+      bits_16_a = old_value_a & bit_mask;
+      bits_16_b = old_value_b & bit_mask;
 
-        if ( bits_16_a == bits_16_b )
-        {
-          result_part_01++;
-        }
-      }
-      else
+      if ( bits_16_a == bits_16_b )
       {
-        bits_16_a = 1;
-        bits_16_b = 2;
+        result_part_01++;
       }
 
       if ( ( pKnzDebug ) || ( bits_16_a == bits_16_b ) )
