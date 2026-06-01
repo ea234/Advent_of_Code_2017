@@ -25,30 +25,31 @@ import java.util.stream.IntStream;
  * 
  * Result Part 1 = 12
  * 
- *  cur_pos    0   cur_len  120   skip    0   start    0   end  119    array [119, 118, 117, 116, 115, 114, 113,
- *  cur_pos  120   cur_len   93   skip    1   start  120   end  212    array [119, 118, 117, 116, 115, 114, 113,
- *  cur_pos  214   cur_len    0   skip    2   start  214   end  213    array [161, 162, 163, 164, 165, 166, 167,
- *  cur_pos  216   cur_len   90   skip    3   start  216   end   49    array [170, 169, 168, 167, 166, 165, 164,
- *  cur_pos   53   cur_len    5   skip    4   start   53   end   57    array [170, 169, 168, 167, 166, 165, 164,
- *  cur_pos   62   cur_len   80   skip    5   start   62   end  141    array [170, 169, 168, 167, 166, 165, 164,
- *  cur_pos  147   cur_len  129   skip    6   start  147   end   19    array [114, 113, 112, 111, 110, 109, 108,
- *  cur_pos   26   cur_len   74   skip    7   start   26   end   99    array [114, 113, 112, 111, 110, 109, 108,
- *  cur_pos  107   cur_len    1   skip    8   start  107   end  107    array [114, 113, 112, 111, 110, 109, 108,
- *  cur_pos  116   cur_len  165   skip    9   start  116   end   24    array [11, 12, 13, 14, 15, 16, 17, 18, 19
- *  cur_pos   34   cur_len  204   skip   10   start   34   end  237    array [11, 12, 13, 14, 15, 16, 17, 18, 19
- *  cur_pos  248   cur_len  255   skip   11   start  248   end  246    array [162, 60, 61, 62, 63, 64, 65, 66, 6
- *  cur_pos    2   cur_len  254   skip   12   start    2   end  255    array [162, 60, 161, 160, 159, 158, 157, 
- *  cur_pos   12   cur_len    2   skip   13   start   12   end   13    array [162, 60, 161, 160, 159, 158, 157, 
- *  cur_pos   27   cur_len   50   skip   14   start   27   end   76    array [162, 60, 161, 160, 159, 158, 157, 
- *  cur_pos   91   cur_len  113   skip   15   start   91   end  203    array [162, 60, 161, 160, 159, 158, 157, 
+ * 
+ *  cur_pos    0   cur_len  120   skip    0   start    0   end  119    array [119, 118, 117, 116, 115, 114, 113, 112, 111, 110, 109, 108, 
+ *  cur_pos  120   cur_len   93   skip    1   start  120   end  212    array [119, 118, 117, 116, 115, 114, 113, 112, 111, 110, 109, 108, 
+ *  cur_pos  214   cur_len    0   skip    2   start  214   end  213    array [119, 118, 117, 116, 115, 114, 113, 112, 111, 110, 109, 108, 
+ *  cur_pos  216   cur_len   90   skip    3   start  216   end   49    array [110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 255, 254, 
+ *  cur_pos   53   cur_len    5   skip    4   start   53   end   57    array [110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 255, 254, 
+ *  cur_pos   62   cur_len   80   skip    5   start   62   end  141    array [110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 255, 254, 
+ *  cur_pos  147   cur_len  129   skip    6   start  147   end   19    array [166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 
+ *  cur_pos   26   cur_len   74   skip    7   start   26   end   99    array [166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 
+ *  cur_pos  107   cur_len    1   skip    8   start  107   end  107    array [166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 
+ *  cur_pos  116   cur_len  165   skip    9   start  116   end   24    array [56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 
+ *  cur_pos   34   cur_len  204   skip   10   start   34   end  237    array [56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 
+ *  cur_pos  248   cur_len  255   skip   11   start  248   end  246    array [118, 7, 6, 5, 4, 3, 2, 1, 0, 212, 211, 210, 209, 208, 207, 2
+ *  cur_pos    2   cur_len  254   skip   12   start    2   end  255    array [118, 7, 119, 255, 254, 253, 252, 251, 250, 249, 248, 247, 24
+ *  cur_pos   12   cur_len    2   skip   13   start   12   end   13    array [118, 7, 119, 255, 254, 253, 252, 251, 250, 249, 248, 247, 18
+ *  cur_pos   27   cur_len   50   skip   14   start   27   end   76    array [118, 7, 119, 255, 254, 253, 252, 251, 250, 249, 248, 247, 18
+ *  cur_pos   91   cur_len  113   skip   15   start   91   end  203    array [118, 7, 119, 255, 254, 253, 252, 251, 250, 249, 248, 247, 18
  * 
  *  cur_pos  219   cur_len    0   skip   16   array 
  * 
  * pCircularList.length 256
- * pCircularList[ 0 ]   162
- * pCircularList[ 1 ]   60
+ * pCircularList[ 0 ]   118
+ * pCircularList[ 1 ]   7
  * 
- * Result Part 1 = 9720
+ * Result Part 1 = 826
  * 
  * 
  * </pre> 
@@ -97,53 +98,55 @@ public class Day10_KnotHash
 
       int index_end_dbg   = index_end;
 
-      while ( index_start != index_end )
+      if ( cur_length > 0 )
       {
-        /*
-         * Swap int values between index-start and index-end
-         */
-        int temp = pCircularList[ index_end ];
-
-        pCircularList[ index_end ] = pCircularList[ index_start ];
-
-        pCircularList[ index_start ] = temp;
-
-        /*
-         * Increase index-start by 1
-         */
-        index_start++;
-
-        /*
-         * If index-start is equal to the circular-list length, index-start is set to 0.
-         */
-        if ( index_start == pCircularList.length )
-        {
-          index_start = 0;
-        }
-
-        /*
-         * After incrementing index-start by one, there has to be a check, wecher 
-         * index-start has reached the index-end.
-         */
-        if ( index_start != index_end )
+        while ( index_start != index_end )
         {
           /*
-           * Decrease index-end by 1
+           * Swap int values between index-start and index-end
            */
-          index_end--;
+          int temp = pCircularList[ index_end ];
+
+          pCircularList[ index_end ] = pCircularList[ index_start ];
+
+          pCircularList[ index_start ] = temp;
 
           /*
-           * If index-end is -1, then index-end is set to the last index
+           * Increase index-start by 1
            */
-          if ( index_end == -1 )
+          index_start++;
+
+          /*
+           * If index-start is equal to the circular-list length, index-start is set to 0.
+           */
+          if ( index_start == pCircularList.length )
           {
-            index_end = pCircularList.length - 1;
+            index_start = 0;
+          }
+
+          /*
+           * After incrementing index-start by one, there has to be a check, wecher 
+           * index-start has reached the index-end.
+           */
+          if ( index_start != index_end )
+          {
+            /*
+             * Decrease index-end by 1
+             */
+            index_end--;
+
+            /*
+             * If index-end is -1, then index-end is set to the last index
+             */
+            if ( index_end == -1 )
+            {
+              index_end = pCircularList.length - 1;
+            }
           }
         }
       }
 
       wl( String.format( " cur_pos %4d   cur_len %4d   skip %4d   start %4d   end %4d    array ", cur_position, cur_length, skip_size, index_start_dbg, index_end_dbg ) + Arrays.toString( pCircularList ) );
-      
 
       /*
        * Calculate the new current position
@@ -175,3 +178,4 @@ public class Day10_KnotHash
     System.out.println( pString );
   }
 }
+
