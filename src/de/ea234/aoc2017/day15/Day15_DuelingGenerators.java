@@ -29,7 +29,38 @@ package de.ea234.aoc2017.day15;
  *   39999999  A   658378693    B  1596284658     A16   4037    B16  24306      00000111111000101     00101111011110010  588
  * 
  * Result Part 1 588
- * Result Part 2 0
+ *
+ * 
+ *
+ *          0  A  1352636452    B  1233683848     A16  38948    B16  34184      01001100000100100     01000010110001000  0
+ *          1  A  1992081072    B   862516352     A16  48816    B16  62592      01011111010110000     01111010010000000  0
+ *          2  A   530830436    B  1159784568     A16  54372    B16  59512      01101010001100100     01110100001111000  0
+ *          3  A  1980017072    B  1616057672     A16  43440    B16   5448      01010100110110000     00001010101001000  0
+ *          4  A   740335192    B   412269392     A16  40536    B16  47952      01001111001011000     01011101101010000  0
+ *       1055  A  1023762912    B   896885216     A16  25056    B16  25056      00110000111100000     00110000111100000  1
+ *       8501  A  2002713344    B  1880947456     A16  64256    B16  64256      01111101100000000     01111101100000000  2
+ *      17221  A   721758040    B  1328293720     A16  10072    B16  10072      00010011101011000     00010011101011000  3
+ *      22558  A  1184621296    B  1128456944     A16  58096    B16  58096      01110001011110000     01110001011110000  4
+ *      52928  A  1859741792    B  2026596448     A16  26720    B16  26720      00110100001100000     00110100001100000  5
+ *      72454  A   301320584    B  1378666888     A16  51592    B16  51592      01100100110001000     01100100110001000  6
+ *      78753  A  1643566624    B   418043424     A16  54816    B16  54816      01101011000100000     01101011000100000  7
+ *     108728  A  1660390296    B   773753752     A16  35736    B16  35736      01000101110011000     01000101110011000  8
+ *     158392  A   956979040    B   556554080     A16  22368    B16  22368      00101011101100000     00101011101100000  9
+ *     944252  A  1399176992    B  1909833504     A16  48928    B16  48928      01011111100100000     01011111100100000  69
+ *     945578  A  1076073904    B  1192793520     A16  38320    B16  38320      01001010110110000     01001010110110000  70
+ *     959077  A  1620790584    B  1107971384     A16  19768    B16  19768      00100110100111000     00100110100111000  71
+ *    1596744  A   148764264    B   329315944     A16  63080    B16  63080      01111011001101000     01111011001101000  107
+ *    1604923  A  1675674712    B    64275544     A16  50264    B16  50264      01100010001011000     01100010001011000  108
+ *    4838979  A   737848568    B   232631544     A16  44280    B16  44280      01010110011111000     01010110011111000  300
+ *    4907560  A  1338347336    B   768446280     A16  36680    B16  36680      01000111101001000     01000111101001000  307
+ *    4968371  A   303542432    B  1548136608     A16  45216    B16  45216      01011000010100000     01011000010100000  308
+ *    4990443  A  1875088144    B   970363664     A16  37648    B16  37648      01001001100010000     01001001100010000  309
+ *    4999999  A   648634980    B  1857401600     A16  25188    B16  45824      00110001001100100     01011001100000000  309
+ * 
+ * Result Part 2 309
+ * 
+ * 
+ * 
  * 
  * 
  * </pre>
@@ -44,9 +75,9 @@ public class Day15_DuelingGenerators
 
     long remainder_div = 2147483647l;
 
-    calculate01( 65, factor_generator_a, 8921, factor_generator_b, remainder_div, true );
+    calculate02( 65, factor_generator_a, 8921, factor_generator_b, remainder_div, true );
 
-    calculate01( 516, factor_generator_a, 190, factor_generator_b, remainder_div, true );
+    //calculate02( 516, factor_generator_a, 190, factor_generator_b, remainder_div, true );
 
     System.exit( 0 );
   }
@@ -55,29 +86,36 @@ public class Day15_DuelingGenerators
   {
     int result_part_01 = 0;
 
-    int result_part_02 = 0;
-
     int repeat_x_times = 40_000_000;
 
-    long bit_mask      = 65535; // = 0xFFFF
+    long bit_mask = 65535; // = 0xFFFF
 
-    long old_value_a   = pGeneratorAStartValue;
+    long old_value_a = pGeneratorAStartValue;
 
-    long old_value_b   = pGeneratorBStartValue;
+    long old_value_b = pGeneratorBStartValue;
+
+    long bits_16_a = 0;
+    long bits_16_b = 0;
 
     for ( int repeat_count = 0; repeat_count < repeat_x_times; repeat_count++ )
     {
       old_value_a = ( old_value_a * pGeneratorAFactor ) % pRemainderDiv;
-
       old_value_b = ( old_value_b * pGeneratorBFactor ) % pRemainderDiv;
 
-      long bits_16_a = old_value_a & bit_mask;
-
-      long bits_16_b = old_value_b & bit_mask;
-
-      if ( bits_16_a == bits_16_b )
+      if ( ( ( old_value_a % 4 ) == 0 ) && ( ( old_value_b % 8 ) == 0 ) )
       {
-        result_part_01++;
+        bits_16_a = old_value_a & bit_mask;
+        bits_16_b = old_value_b & bit_mask;
+
+        if ( bits_16_a == bits_16_b )
+        {
+          result_part_01++;
+        }
+      }
+      else
+      {
+        bits_16_a = 1;
+        bits_16_b = 2;
       }
 
       if ( ( pKnzDebug ) || ( bits_16_a == bits_16_b ) )
@@ -94,8 +132,59 @@ public class Day15_DuelingGenerators
 
     wl( "" );
     wl( "Result Part 1 " + result_part_01 );
-    wl( "Result Part 2 " + result_part_02 );
     wl( "" );
+    wl( "" );
+  }
+
+  private static void calculate02( long pGeneratorAStartValue, long pGeneratorAFactor, long pGeneratorBStartValue, long pGeneratorBFactor, long pRemainderDiv, boolean pKnzDebug )
+  {
+    int result_part_02 = 0;
+
+    int repeat_x_times = 5_000_000;
+
+    long bit_mask = 65535; // = 0xFFFF
+
+    long old_value_a = pGeneratorAStartValue;
+
+    long old_value_b = pGeneratorBStartValue;
+
+    long bits_16_a = 0;
+    long bits_16_b = 0;
+
+    for ( int repeat_count = 0; repeat_count < repeat_x_times; repeat_count++ )
+    {
+      do
+      {
+        old_value_a = ( old_value_a * pGeneratorAFactor ) % pRemainderDiv;
+      } while ( ( old_value_a % 4 ) > 0 );
+
+      do
+      {
+        old_value_b = ( old_value_b * pGeneratorBFactor ) % pRemainderDiv;
+      } while ( ( old_value_b % 8 ) > 0 );
+
+      bits_16_a = old_value_a & bit_mask;
+      bits_16_b = old_value_b & bit_mask;
+
+      if ( bits_16_a == bits_16_b )
+      {
+        result_part_02++;
+      }
+
+      if ( ( pKnzDebug ) || ( bits_16_a == bits_16_b ) )
+      {
+        if ( ( ( repeat_count < 5 ) || ( repeat_count > ( repeat_x_times - 2 ) ) ) || ( bits_16_a == bits_16_b ) )
+        {
+          String bits_a = String.format( "%17s", Long.toBinaryString( bits_16_a ) ).replace( ' ', '0' );
+          String bits_b = String.format( "%17s", Long.toBinaryString( bits_16_b ) ).replace( ' ', '0' );
+
+          wl( String.format( "%10d  A  %10d    B  %10d     A16  %5d    B16  %5d ", repeat_count, old_value_a, old_value_b, bits_16_a, bits_16_b ) + "     " + bits_a + "     " + bits_b + "  " + result_part_02 );
+        }
+      }
+    }
+
+    wl( "" );
+    wl( "Result Part 2 " + result_part_02 );
     wl( "" );
   }
 
