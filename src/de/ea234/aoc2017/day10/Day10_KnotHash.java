@@ -51,7 +51,12 @@ import java.util.stream.IntStream;
  * 
  * Result Part 1 = 826
  * 
- * 
+ * Input            = a2582a3a0e66e6e86e3812dcb672a272    OK  
+ * Input AoC 2017   = 33efeb34ea91902bb2f59c9920caa6cd    OK  
+ * Input 1,2,3      = 3efbe78a8d82f29979031a4aa0b16a9d    OK  
+ * Input 1,2,4      = 63960835bcdc130f0b66d7ff4f6a5a8e    OK  
+ * Input 120,93,0,90,5,80,129,74,1,165,204,255,254,2,50,113 = d067d3f14d07e09c2e7308c3926605c4    OK
+ *   
  * </pre> 
  */
 public class Day10_KnotHash
@@ -60,9 +65,9 @@ public class Day10_KnotHash
   {
     int[] test_circular_list = { 0, 1, 2, 3, 4 };
 
-    int[] test_lengths       = { 3, 4, 1, 5 };
+    int[] test_lengths = { 3, 4, 1, 5 };
 
-    calcList( test_circular_list, test_lengths );
+    calcKnotHashPart01( test_circular_list, test_lengths );
 
     /*
      * 
@@ -74,12 +79,205 @@ public class Day10_KnotHash
 
     int[] circular_list = IntStream.rangeClosed( 0, 255 ).toArray();
 
-    calcList( circular_list, input_lengths );
+    calcKnotHashPart01( circular_list, input_lengths );
+
+    testKnotHash( "",          "a2582a3a0e66e6e86e3812dcb672a272" );
+    testKnotHash( "AoC 2017",  "33efeb34ea91902bb2f59c9920caa6cd" );
+    testKnotHash( "1,2,3",     "3efbe78a8d82f29979031a4aa0b16a9d" );
+    testKnotHash( "1,2,4",     "63960835bcdc130f0b66d7ff4f6a5a8e" );
+
+    testKnotHash( "120,93,0,90,5,80,129,74,1,165,204,255,254,2,50,113", "d067d3f14d07e09c2e7308c3926605c4" );
 
     System.exit( 0 );
   }
 
-  private static void calcList( int[] pCircularList, int[] pListInputLengths )
+  private static void testKnotHash( String pInput, String pExpected )
+  {
+    String knot_hash = calcKnotHash( pInput );
+
+    wl( String.format( "Input %-10s = %-32s  %s", pInput, knot_hash, ( knot_hash.equals( pExpected ) ? "  OK  " : "#### ERR ####" ) ) );
+  }
+
+  private static void testXOR()
+  {
+    int[] test_list = { 65, 27, 9, 1, 4, 3, 40, 50, 91, 7, 6, 0, 2, 5, 68, 22 };
+
+    int xor_value = 0;
+
+    for ( int cur_index = 0; cur_index < 16; cur_index++ )
+    {
+      xor_value = xor_value ^ test_list[ cur_index ];
+
+    }
+
+    wl( "" + xor_value ); // = 64
+  }
+
+  public static String convertToAsciiInputString( String pString )
+  {
+    String str_result = null;
+
+    /*
+     * Convert the String to ASCII-String
+     */
+    if ( ( pString != null ) && ( pString.length() > 0 ) )
+    {
+      str_result = "";
+
+      int cur_index = 0;
+
+      while ( cur_index < pString.length() )
+      {
+        str_result += ( (int) pString.charAt( cur_index ) );
+
+        str_result += ",";
+
+        cur_index++;
+      }
+    }
+
+    /*
+     * Add the end-sequenze to the converted string.
+     */
+    return ( str_result != null ? str_result : "" ) + "17,31,73,47,23";
+  }
+
+  private static String calcKnotHash( String pInput )
+  {
+    String lengths      = convertToAsciiInputString( pInput );
+
+    int[] input_lengths = Arrays.stream( lengths.split( "," ) ).map( String::trim ).mapToInt( Integer::parseInt ).toArray();
+
+    int[] circular_list = IntStream.rangeClosed( 0, 255 ).toArray();
+
+    int cur_position = 0;
+
+    int skip_size    = 0;
+
+    for ( int round_nr = 0; round_nr < 64; round_nr++ )
+    {
+      /*
+       * Loop over all input lengths
+       */
+      for ( int cur_length : input_lengths )
+      {
+        int index_start = cur_position;
+
+        int index_end   = ( ( cur_position + cur_length ) - 1 ) % circular_list.length;
+
+        int index_start_dbg = index_start;
+
+        int index_end_dbg  = index_end;
+
+        if ( cur_length > 0 )
+        {
+          while ( index_start != index_end )
+          {
+            /*
+             * Swap int values between index-start and index-end
+             */
+            int temp = circular_list[ index_end ];
+
+            circular_list[ index_end ] = circular_list[ index_start ];
+
+            circular_list[ index_start ] = temp;
+
+            /*
+             * Increase index-start by 1
+             */
+            index_start++;
+
+            /*
+             * If index-start is equal to the circular-list length, index-start is set to 0.
+             */
+            if ( index_start == circular_list.length )
+            {
+              index_start = 0;
+            }
+
+            /*
+             * After incrementing index-start by one, there has to be a check, wecher 
+             * index-start has reached the index-end.
+             */
+            if ( index_start != index_end )
+            {
+              /*
+               * Decrease index-end by 1
+               */
+              index_end--;
+
+              /*x_hash
+               * If index-end is -1, then index-end is set to the last index
+               */
+              if ( index_end == -1 )
+              {
+                index_end = circular_list.length - 1;
+              }
+            }
+          }
+        }
+
+        //wl( String.format( " cur_pos %4d   cur_len %4d   skip %4d   start %4d   end %4d    array ", cur_position, cur_length, skip_size, index_start_dbg, index_end_dbg ) + Arrays.toString( pCircularList ) );
+
+        /*
+         * Calculate the new current position
+         */
+        cur_position = ( ( ( cur_position + cur_length ) ) + skip_size ) % circular_list.length;
+
+        /*
+         * Increase the skip-size by one
+         */
+        skip_size++;
+      }
+    }
+
+    /*
+     * Create an array for the dense-hash values.
+     */
+    int[] dense_hash_arr = new int[ 16 ];
+
+    int dense_hash_index = 0;
+
+    int count_nr         = 0;
+
+    /*
+     * For-loop over all the values in the circular-list.
+     * Every 16th group sublist is xor'd to the dense-hash.
+     */
+    for ( int cur_index = 0; cur_index < 256; cur_index++ )
+    {
+      dense_hash_arr[ dense_hash_index ] = dense_hash_arr[ dense_hash_index ] ^ circular_list[ cur_index ];
+
+      /*
+       * Increase the counter
+       */
+      count_nr++;
+
+      /*
+       * If the counter is 16, then the next 16th group started
+       */
+      if ( count_nr == 16 )
+      {
+        dense_hash_index++;
+
+        count_nr = 0;
+      }
+    }
+
+    /*
+     * Create the hex-output string
+     */
+    StringBuilder hex_string = new StringBuilder();
+
+    for ( int cur_index = 0; cur_index < 16; cur_index++ )
+    {
+      hex_string.append( String.format( "%02x", dense_hash_arr[ cur_index ] ) );
+    }
+
+    return hex_string.toString();
+  }
+
+  private static void calcKnotHashPart01( int[] pCircularList, int[] pListInputLengths )
   {
     int cur_position = 0;
 
@@ -178,4 +376,3 @@ public class Day10_KnotHash
     System.out.println( pString );
   }
 }
-
