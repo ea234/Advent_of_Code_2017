@@ -1,6 +1,9 @@
 package de.ea234.aoc2017.day14;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 import java.util.stream.IntStream;
 
 /**
@@ -11,20 +14,31 @@ import java.util.stream.IntStream;
  * 
  * https://www.reddit.com/r/adventofcode/comments/7jpelc/2017_day_14_solutions/
  * 
+ * 
+ * Rekursive Region-Code similar to AOC 2024 Day 12
+ * 
+ * https://adventofcode.com/2024/day/12
+ * 
+ * https://github.com/ea234/Advent_of_Code_2024/blob/main/src/de/ea234/aoc2024/day12/Day12GardenGroups.java
+ * 
+ * 
+ * Result Part 01: 8140
+ * Result Part 02: 1182
+ * 
  * </pre> 
  */
 public class Day14_DiskDefragmentation
 {
   public static void main( String[] args )
   {
-    calcPart1( "flqrgnkx" );
+    calc( "flqrgnkx" );
 
-    calcPart1( "jxqlasbh" );
+    calc( "jxqlasbh" );
 
     System.exit( 0 );
   }
 
-  private static void calcPart1( String pKeyString )
+  private static void calc( String pKeyString )
   {
     /*
      * *******************************************************************************************************
@@ -32,15 +46,15 @@ public class Day14_DiskDefragmentation
      * *******************************************************************************************************
      */
 
-    String[] key_hashes = new String[ 128 ];
+    String[] key_hashes_bin = new String[ 128 ];
 
-    for ( int cur_index = 0; cur_index < 128; cur_index++ )
+    for ( int cur_hash_index = 0; cur_hash_index < 128; cur_hash_index++ )
     {
-      String cur_key = pKeyString + "-" + cur_index;
+      String cur_key = pKeyString + "-" + cur_hash_index;
 
-      key_hashes[ cur_index ] = calcKnotHashModified( cur_key );
+      key_hashes_bin[ cur_hash_index ] = calcKnotHashModified( cur_key, true );
 
-      wl( String.format( "%-13s  = %32s", cur_key, key_hashes[ cur_index ] ) );
+      wl( String.format( "%-13s  = %32s", cur_key, key_hashes_bin[ cur_hash_index ] ) );
     }
 
     /*
@@ -49,21 +63,116 @@ public class Day14_DiskDefragmentation
      * *******************************************************************************************************
      */
 
+    Properties prop_grid_disk = new Properties();
+
     int result_part_01 = 0;
 
-    for ( int cur_index = 0; cur_index < 128; cur_index++ )
+    for ( int cur_hash_index = 0; cur_hash_index < 128; cur_hash_index++ )
     {
-      for ( int zz = 0; zz < key_hashes[ cur_index ].length(); zz++ )
+      for ( int cur_str_index = 0; cur_str_index < key_hashes_bin[ cur_hash_index ].length(); cur_str_index++ )
       {
-        if ( key_hashes[ cur_index ].charAt( zz ) == '1' )
+        if ( key_hashes_bin[ cur_hash_index ].charAt( cur_str_index ) == '1' )
         {
           result_part_01++;
+
+          prop_grid_disk.setProperty( "R" + cur_hash_index + "C" + cur_str_index, "1" );
         }
       }
     }
 
-    wl( "Result Part 01: " + result_part_01 );
+    /*
+     * *******************************************************************************************************
+     * Rekursive Region Search (... see AOC 2024 - Day 12) 
+     * *******************************************************************************************************
+     */
 
+    int result_part_02 = 0;
+
+    for ( int current_row = 0; current_row < 128; current_row++ )
+    {
+      for ( int current_col = 0; current_col < 182; current_col++ )
+      {
+        char current_char = prop_grid_disk.getProperty( "R" + current_row + "C" + current_col, "." ).charAt( 0 );
+
+        if ( current_char == '1' )
+        {
+          wl( "Calulating Region Entry at " + "R" + current_row + "C" + current_col );
+
+          getRegion( prop_grid_disk, current_row, current_col, 128, 128 );
+
+          result_part_02++;
+        }
+      }
+    }
+
+    wl( "" );
+    wl( "Result Part 01: " + result_part_01 );
+    wl( "Result Part 02: " + result_part_02 );
+    wl( "" );
+    wl( "" );
+  }
+
+  private static void getRegion( Properties pGrid, long pRow, long pCol, int pMaxRow, int pMaxCol )
+  {
+    /*
+     * The new row exceeds the max rows, so no match 
+     */
+    if ( pRow > pMaxRow )
+    {
+      return;
+    }
+
+    /*
+     * The new col exceeds the max cols, so no match
+     */
+    if ( pCol > pMaxCol )
+    {
+      return;
+    }
+
+    /*
+     * Get the grid value
+     */
+    char grid_type = pGrid.getProperty( "R" + pRow + "C" + pCol, "." ).charAt( 0 );
+
+    if ( grid_type != '1' )
+    {
+      return;
+    }
+
+    /*
+     * Found match 
+     * This match can also be the first entry grid coordinates.
+     */
+
+    /*
+     * Remove the Char from the grid
+     * Preventing this coordinates to be found again by this recursive function.
+     * It will go to the left and upwards, just to find odly shapes.
+     */
+    pGrid.setProperty( "R" + pRow + "C" + pCol, "." );
+
+    /*
+     * Go Right
+     */
+    getRegion( pGrid, pRow, pCol + 1, pMaxRow, pMaxCol );
+
+    /*
+     * Go Down
+     */
+    getRegion( pGrid, pRow + 1, pCol, pMaxRow, pMaxCol );
+
+    /*
+     * Go to the left
+     */
+    getRegion( pGrid, pRow, pCol - 1, pMaxRow, pMaxCol );
+
+    /*
+     * Go up
+     */
+    getRegion( pGrid, pRow - 1, pCol, pMaxRow, pMaxCol );
+
+    return;
   }
 
   private static void wl( String pString ) // wl = short for "write log"
@@ -100,7 +209,7 @@ public class Day14_DiskDefragmentation
     return ( str_result != null ? str_result : "" ) + "17,31,73,47,23";
   }
 
-  private static String calcKnotHashModified( String pInput )
+  private static String calcKnotHashModified( String pInput, boolean pKnzOutputBinaer )
   {
     String lengths = convertToAsciiInputString( pInput );
 
@@ -222,18 +331,30 @@ public class Day14_DiskDefragmentation
       }
     }
 
-    /*
-     * MODIFICATION
-     * The result is no longer a hex-string, but its binary
-     */
-    StringBuilder bin_string = new StringBuilder();
+    if ( pKnzOutputBinaer )
+    {
+      /*
+       * MODIFICATION
+       * The result is no longer a hex-string, but its binary
+       */
+      StringBuilder bin_string = new StringBuilder();
+
+      for ( int cur_index = 0; cur_index < 16; cur_index++ )
+      {
+        bin_string.append( String.format( "%8s", Integer.toBinaryString( dense_hash_arr[ cur_index ] ) ).replace( ' ', '0' ) );
+      }
+
+      return bin_string.toString();
+    }
+
+    StringBuilder hex_string = new StringBuilder();
 
     for ( int cur_index = 0; cur_index < 16; cur_index++ )
     {
-      bin_string.append( String.format( "%8s", Integer.toBinaryString( dense_hash_arr[ cur_index ] ) ).replace( ' ', '0' ) );
+      hex_string.append( String.format( "%02x", dense_hash_arr[ cur_index ] ) );
     }
 
-    return bin_string.toString();
+    return hex_string.toString();
   }
 }
 /*
