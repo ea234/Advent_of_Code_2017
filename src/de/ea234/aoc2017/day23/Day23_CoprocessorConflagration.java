@@ -86,11 +86,6 @@ import java.util.stream.Collectors;
  * Result Part 1 6
  * Result Part 2 0
  * 
- * ea234@MsiZ370:/mnt/hd4tbb/00_Daten$ python3 t.py
-6241
-50338
-915
-ea234@MsiZ370:/mnt/h
  * </pre> 
  */
 public class Day23_CoprocessorConflagration
@@ -114,8 +109,8 @@ public class Day23_CoprocessorConflagration
     long result_part_01 = 0;
     long result_part_02 = 0;
 
-    result_part_01 = run( pListInput, pKnzDebug );
-    //result_part_02 = run( pListInput, pKnzDebug );
+    result_part_01 = run( pListInput, 0, pKnzDebug );
+    //result_part_02 = run( pListInput, 1, pKnzDebug );
 
     wl( "" );
     wl( "------------------------------------------------------------------------------------------" );
@@ -124,7 +119,7 @@ public class Day23_CoprocessorConflagration
     wl( "" );
   }
 
-  private static long run( List< String > pListInput, boolean pKnzDebug )
+  private static long run( List< String > pListInput, long pInitValueA, boolean pKnzDebug )
   {
     if ( pKnzDebug )
     {
@@ -143,6 +138,8 @@ public class Day23_CoprocessorConflagration
     {
       register_vector[ idx ] = 0l;
     }
+
+    register_vector[ 97 ] = pInitValueA;
 
     int pgm_counter = 0;
 
@@ -173,7 +170,18 @@ public class Day23_CoprocessorConflagration
       {
         int old_pgm_counter = pgm_counter;
 
-        if ( register_vector[ ( (int) char_register_op ) ] != 0 )
+        long check_value = 0;
+
+        if ( ( char_register_op >= 'a' ) && ( char_register_op <= 'z' ) )
+        {
+          check_value = register_vector[ ( (int) char_register_op ) ];
+        }
+        else
+        {
+          check_value = Long.parseLong( "" + char_register_op );
+        }
+
+        if ( check_value != 0 )
         {
           pgm_counter += ins_val;
 
@@ -232,7 +240,7 @@ public class Day23_CoprocessorConflagration
     }
 
     wl( "" );
-    wl( "pgm_counter " + pgm_counter );
+    wl( "pgm_counter  " + pgm_counter );
     wl( "step_counter " + step_counter );
     wl( "" );
     wl( "" );
