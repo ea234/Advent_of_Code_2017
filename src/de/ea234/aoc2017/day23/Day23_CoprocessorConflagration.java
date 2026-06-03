@@ -86,14 +86,18 @@ import java.util.stream.Collectors;
  * Result Part 1 6
  * Result Part 2 0
  * 
- * 
+ * ea234@MsiZ370:/mnt/hd4tbb/00_Daten$ python3 t.py
+6241
+50338
+915
+ea234@MsiZ370:/mnt/h
  * </pre> 
  */
 public class Day23_CoprocessorConflagration
 {
   public static void main( String[] args )
   {
-    calculate01( getListProd(), true );
+    calculate01( getListProd(), false );
 
     System.exit( 0 );
   }
@@ -135,37 +139,62 @@ public class Day23_CoprocessorConflagration
 
     long[] register_vector = new long[ 130 ];
 
-    for ( int idx = 97; idx < 128; idx++ )
+    for ( int idx = 90; idx < 130; idx++ )
     {
-      register_vector[ idx ] = 0;
+      register_vector[ idx ] = 0l;
     }
 
     int pgm_counter = 0;
 
     long step_counter = 0;
 
-    while ( ( pgm_counter < pListInput.size() ) && ( step_counter < 50 ) )//1_000_000_000 ) )
+    while ( ( pgm_counter >= 0 ) && ( pgm_counter < pListInput.size() ) && ( step_counter < 60_000 ) )
     {
       String input_str = pListInput.get( pgm_counter );
 
       char char_register_op = input_str.charAt( 4 );
 
+      char char_register_from = input_str.charAt( 6 );
+
+      register_vector[ index_op_old_value ] = register_vector[ ( (int) char_register_op ) ];
+
+      long ins_val = 0;
+
+      if ( ( char_register_from >= 'a' ) && ( char_register_from <= 'z' ) )
       {
-        char char_register_from = input_str.charAt( 6 );
+        ins_val = register_vector[ ( (int) char_register_from ) ];
+      }
+      else
+      {
+        ins_val = Integer.parseInt( input_str.substring( 6 ) );
+      }
 
-        register_vector[ index_op_old_value ] = register_vector[ ( (int) char_register_op ) ];
+      if ( input_str.startsWith( "jnz" ) )
+      {
+        int old_pgm_counter = pgm_counter;
 
-        long ins_val = 0;
-
-        if ( ( char_register_from >= 'a' ) && ( char_register_from <= 'z' ) )
+        if ( register_vector[ ( (int) char_register_op ) ] != 0 )
         {
-          ins_val = register_vector[ ( (int) char_register_from ) ];
+          pgm_counter += ins_val;
+
+          if ( pKnzDebug )
+          {
+            wl( String.format( "%6d %4d JNZ 1  \"" + char_register_op + "\"  VALUE       %11d", step_counter, old_pgm_counter, register_vector[ ( (int) char_register_op ) ] ) );
+          }
+
         }
         else
         {
-          ins_val = Integer.parseInt( input_str.substring( 6 ) );
-        }
+          if ( pKnzDebug )
+          {
+            wl( String.format( "%6d %4d JNZ 0  \"" + char_register_op + "\"  VALUE       %11d", step_counter, old_pgm_counter, register_vector[ ( (int) char_register_op ) ] ) );
+          }
 
+          pgm_counter++;
+        }
+      }
+      else
+      {
         if ( input_str.startsWith( "set" ) )
         {
           register_vector[ ( (int) char_register_op ) ] = ins_val;
@@ -174,8 +203,6 @@ public class Day23_CoprocessorConflagration
           {
             wl( String.format( "%6d %4d SET    \"" + char_register_op + "\"  VALUE   OLD %11d   TO %11d   NEW %11d", step_counter, pgm_counter, register_vector[ index_op_old_value ], ins_val, register_vector[ ( (int) char_register_op ) ] ) );
           }
-
-          pgm_counter++;
         }
         else if ( input_str.startsWith( "sub" ) )
         {
@@ -185,8 +212,6 @@ public class Day23_CoprocessorConflagration
           {
             wl( String.format( "%6d %4d SUB    \"" + char_register_op + "\"  VALUE   OLD %11d   +  %11d   NEW %11d", step_counter, pgm_counter, register_vector[ index_op_old_value ], ins_val, register_vector[ ( (int) char_register_op ) ] ) );
           }
-
-          pgm_counter++;
         }
         else if ( input_str.startsWith( "mul" ) )
         {
@@ -198,37 +223,9 @@ public class Day23_CoprocessorConflagration
           {
             wl( String.format( "%6d %4d MUL    \"" + char_register_op + "\"  VALUE   OLD %11d   *  %11d   NEW %11d", step_counter, pgm_counter, register_vector[ index_op_old_value ], ins_val, register_vector[ ( (int) char_register_op ) ] ) );
           }
-
-          pgm_counter++;
         }
-        else if ( input_str.startsWith( "jnz" ) )
-        {
-          int old_pgm_counter = pgm_counter;
 
-          if ( register_vector[ ( (int) char_register_op ) ] != 0 )
-          {
-            pgm_counter += ins_val;
-
-            if ( pKnzDebug )
-            {
-              wl( String.format( "%6d %4d JNZ 1  \"" + char_register_op + "\"  VALUE       %11d", step_counter, old_pgm_counter, register_vector[ ( (int) char_register_op ) ] ) );
-            }
-
-          }
-          else
-          {
-            if ( pKnzDebug )
-            {
-              wl( String.format( "%6d %4d JNZ 0  \"" + char_register_op + "\"  VALUE       %11d", step_counter, old_pgm_counter, register_vector[ ( (int) char_register_op ) ] ) );
-            }
-
-            pgm_counter++;
-          }
-        }
-        else
-        {
-          wl( "unkn " + input_str );
-        }
+        pgm_counter++;
       }
 
       step_counter++;
