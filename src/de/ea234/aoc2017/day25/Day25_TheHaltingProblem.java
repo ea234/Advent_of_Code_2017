@@ -20,36 +20,28 @@ import java.util.stream.Collectors;
  * 
  * 
  * 
- * Begin in state A.
- * Perform a diagnostic checksum after 6 steps.
- * 
- * In state A:
- * In state B:
- * 
  * 
  * begin_state      A
  * diagnostic_steps 6
  * 
  * State A Value 0 Write 1 Move r Cont B    Value 1 Write 0 Move l Cont B
  * State B Value 0 Write 1 Move l Cont A    Value 1 Write 1 Move r Cont A
+ * 
  * Cur Value 0  State A  New Value 1   Cursor r       1   State B   
- * Cur Value 1  State B  New Value 1   Cursor r       2   State A   
- * Cur Value 1  State A  New Value 0   Cursor l       1   State B   
  * Cur Value 0  State B  New Value 1   Cursor l       0   State A   
  * Cur Value 1  State A  New Value 0   Cursor l      -1   State B   
  * Cur Value 0  State B  New Value 1   Cursor l      -2   State A   
- * 
+ * Cur Value 0  State A  New Value 1   Cursor r      -1   State B   
+ * Cur Value 1  State B  New Value 1   Cursor r       0   State A   
  * 
  * cursor_min    -2
- * cursor_max    2
+ * cursor_max    1
  * 
  * ------------------------------------------------------------------------------------------
  * Result Part 1 3
  * Result Part 2 0
- *
  * 
- * Begin in state A.
- * Perform a diagnostic checksum after 12368930 steps.
+ * 
  * 
  * begin_state      A
  * diagnostic_steps 12368930
@@ -62,11 +54,11 @@ import java.util.stream.Collectors;
  * State F Value 0 Write 1 Move r Cont A    Value 1 Write 1 Move r Cont E
  * 
  * 
- * cursor_min    -4122975
- * cursor_max    2
+ * cursor_min    -3988
+ * cursor_max    101
  * 
  * ------------------------------------------------------------------------------------------
- * Result Part 1 1
+ * Result Part 1 2725
  * Result Part 2 0
  * 
  * </pre> 
@@ -175,6 +167,8 @@ public class Day25_TheHaltingProblem
       wl( touring_state.toString() );
     }
 
+    wl( "" );
+
     /*
      * *******************************************************************************************************
      * Doing the loop
@@ -190,32 +184,63 @@ public class Day25_TheHaltingProblem
 
     for ( int cur_step_count = 0; cur_step_count < diagnostic_steps; cur_step_count++ )
     {
-      Day25State cur_touring_state = touring_machine.get( cur_state );
-
+      /*
+       * Get the current value 
+       */
       int cur_prop_value = Integer.parseInt( prop_memory.getProperty( "" + cursor_position, "0" ) );
 
+      /*
+       * Get the touring state 
+       */
+      Day25State cur_touring_state = touring_machine.get( cur_state );
+
+      /*
+       * Get the touring action from the touring state according to the current value 
+       */
       Day25Action touring_action = cur_touring_state.getAction( cur_prop_value );
 
+      /*
+       * Get the value to write
+       */
       int new_prop_value = touring_action.getWriteValue();
 
+      /*
+       * Move the cursor position
+       * l = left  = -1
+       * r = ritht = +1
+       */
       int new_cursor_position = touring_action.getMoveDirection() == 'l' ? cursor_position - 1 : cursor_position + 1;
 
+      /*
+       * Get some debug info
+       */
       cursor_min = Math.min( cursor_min, new_cursor_position );
-
       cursor_max = Math.max( cursor_max, new_cursor_position );
 
+      /*
+       * Get the next state
+       */
       String new_state = touring_action.getContinueState();
 
+      /*
+       * Write some debug-info
+       */
       if ( pKnzDebug )
       {
         wl( String.format( "Cur Value %1d  State %1s  New Value %1d   Cursor %s %7d   State %s   ", cur_prop_value, cur_state, new_prop_value, touring_action.getMoveDirection(), new_cursor_position, new_state ) );
       }
 
+      /*
+       * Write the new value to the "memory"
+       */
+      prop_memory.setProperty( "" + cursor_position, "" + new_prop_value );
+
+      /*
+       * Update the cursor-position and state
+       */
       cursor_position = new_cursor_position;
 
-      cur_state       = new_state;
-
-      prop_memory.setProperty( "" + cursor_position, "" + new_prop_value );
+      cur_state = new_state;
     }
 
     /*
@@ -234,7 +259,6 @@ public class Day25_TheHaltingProblem
       }
     }
 
-    wl( "" );
     wl( "" );
     wl( "cursor_min    " + cursor_min );
     wl( "cursor_max    " + cursor_max );
