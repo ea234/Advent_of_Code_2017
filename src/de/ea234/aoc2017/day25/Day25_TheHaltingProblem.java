@@ -24,18 +24,15 @@ import java.util.stream.Collectors;
  * begin_state      A
  * diagnostic_steps 6
  * 
- * State A Value 0 Write 1 Move r Cont B    Value 1 Write 0 Move l Cont B
- * State B Value 0 Write 1 Move l Cont A    Value 1 Write 1 Move r Cont A
+ * State A    Value 0 Write 1 Move r Cont B    Value 1 Write 0 Move l Cont B
+ * State B    Value 0 Write 1 Move l Cont A    Value 1 Write 1 Move r Cont A
  * 
- * Cur Value 0  State A  New Value 1   Cursor r       1   State B   
- * Cur Value 0  State B  New Value 1   Cursor l       0   State A   
- * Cur Value 1  State A  New Value 0   Cursor l      -1   State B   
- * Cur Value 0  State B  New Value 1   Cursor l      -2   State A   
- * Cur Value 0  State A  New Value 1   Cursor r      -1   State B   
- * Cur Value 1  State B  New Value 1   Cursor r       0   State A   
- * 
- * cursor_min    -2
- * cursor_max    1
+ * Step    0   Cur Value 0  State A  New Value 1   Cursor r       1   State B   
+ * Step    1   Cur Value 0  State B  New Value 1   Cursor l       0   State A   
+ * Step    2   Cur Value 1  State A  New Value 0   Cursor l      -1   State B   
+ * Step    3   Cur Value 0  State B  New Value 1   Cursor l      -2   State A   
+ * Step    4   Cur Value 0  State A  New Value 1   Cursor r      -1   State B   
+ * Step    5   Cur Value 1  State B  New Value 1   Cursor r       0   State A   
  * 
  * ------------------------------------------------------------------------------------------
  * Result Part 1 3
@@ -46,20 +43,18 @@ import java.util.stream.Collectors;
  * begin_state      A
  * diagnostic_steps 12368930
  * 
- * State A Value 0 Write 1 Move r Cont B    Value 1 Write 0 Move r Cont C
- * State B Value 0 Write 0 Move l Cont A    Value 1 Write 0 Move r Cont D
- * State C Value 0 Write 1 Move r Cont D    Value 1 Write 1 Move r Cont A
- * State D Value 0 Write 1 Move l Cont E    Value 1 Write 0 Move l Cont D
- * State E Value 0 Write 1 Move r Cont F    Value 1 Write 1 Move l Cont B
- * State F Value 0 Write 1 Move r Cont A    Value 1 Write 1 Move r Cont E
+ * State A    Value 0 Write 1 Move r Cont B    Value 1 Write 0 Move r Cont C
+ * State B    Value 0 Write 0 Move l Cont A    Value 1 Write 0 Move r Cont D
+ * State C    Value 0 Write 1 Move r Cont D    Value 1 Write 1 Move r Cont A
+ * State D    Value 0 Write 1 Move l Cont E    Value 1 Write 0 Move l Cont D
+ * State E    Value 0 Write 1 Move r Cont F    Value 1 Write 1 Move l Cont B
+ * State F    Value 0 Write 1 Move r Cont A    Value 1 Write 1 Move r Cont E
  * 
- * 
- * cursor_min    -3988
- * cursor_max    101
  * 
  * ------------------------------------------------------------------------------------------
  * Result Part 1 2725
  * Result Part 2 0
+ * 
  * 
  * </pre> 
  */
@@ -179,9 +174,6 @@ public class Day25_TheHaltingProblem
 
     int cursor_position = 0;
 
-    int cursor_min = 0;
-    int cursor_max = 0;
-
     for ( int cur_step_count = 0; cur_step_count < diagnostic_steps; cur_step_count++ )
     {
       /*
@@ -200,11 +192,6 @@ public class Day25_TheHaltingProblem
       Day25Action touring_action = cur_touring_state.getAction( cur_prop_value );
 
       /*
-       * Get the value to write
-       */
-      int new_prop_value = touring_action.getWriteValue();
-
-      /*
        * Move the cursor position
        * l = left  = -1
        * r = ritht = +1
@@ -212,35 +199,24 @@ public class Day25_TheHaltingProblem
       int new_cursor_position = touring_action.getMoveDirection() == 'l' ? cursor_position - 1 : cursor_position + 1;
 
       /*
-       * Get some debug info
-       */
-      cursor_min = Math.min( cursor_min, new_cursor_position );
-      cursor_max = Math.max( cursor_max, new_cursor_position );
-
-      /*
-       * Get the next state
-       */
-      String new_state = touring_action.getContinueState();
-
-      /*
        * Write some debug-info
        */
       if ( pKnzDebug )
       {
-        wl( String.format( "Cur Value %1d  State %1s  New Value %1d   Cursor %s %7d   State %s   ", cur_prop_value, cur_state, new_prop_value, touring_action.getMoveDirection(), new_cursor_position, new_state ) );
+        wl( String.format( "Step %4d   Cur Value %1d  State %1s  New Value %1d   Cursor %s %7d   State %s   ", cur_step_count, cur_prop_value, cur_state, touring_action.getWriteValue(), touring_action.getMoveDirection(), new_cursor_position, touring_action.getContinueState() ) );
       }
 
       /*
        * Write the new value to the "memory"
        */
-      prop_memory.setProperty( "" + cursor_position, "" + new_prop_value );
+      prop_memory.setProperty( "" + cursor_position, "" + touring_action.getWriteValue() );
 
       /*
        * Update the cursor-position and state
        */
       cursor_position = new_cursor_position;
 
-      cur_state = new_state;
+      cur_state = touring_action.getContinueState();
     }
 
     /*
@@ -259,9 +235,6 @@ public class Day25_TheHaltingProblem
       }
     }
 
-    wl( "" );
-    wl( "cursor_min    " + cursor_min );
-    wl( "cursor_max    " + cursor_max );
     wl( "" );
     wl( "------------------------------------------------------------------------------------------" );
     wl( "Result Part 1 " + result_part_01 );
