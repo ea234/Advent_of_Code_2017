@@ -112,8 +112,8 @@ public class Day13_PacketScanners
     wl( "" );
     wl( "------------------------------------------------------------------------------------------" );
 
-    long result_part_01 = 0;
-    long result_part_02 = 0;
+    int result_part_01 = 0;
+    int result_part_02 = 0;
 
     /*
      * *******************************************************************************************************
@@ -152,7 +152,6 @@ public class Day13_PacketScanners
         int index_delimiter = input_str.indexOf( ":" );
 
         int cur_depth = Integer.parseInt( input_str.substring( 0, index_delimiter ) );
-
         int cur_range = Integer.parseInt( input_str.substring( index_delimiter + 1 ).trim() );
 
         depth_array[ cur_depth ] = cur_range;
@@ -171,29 +170,85 @@ public class Day13_PacketScanners
 
     wl( "" );
 
-    for ( int idx_packet = 0; idx_packet < max_depth; idx_packet++ )
+    result_part_01 = calcRisk( depth_array, depth_range, depth_delta, max_depth, 0 );
+
+    result_part_02 = 0;
+
+    for ( int delay_time = 1; delay_time < 15_000; delay_time++ )
     {
-      if ( depth_range[ idx_packet ] == 1 )
+      int result_temp = calcRisk( depth_array, depth_range, depth_delta, max_depth, delay_time );
+
+      if ( result_temp == 0 )
       {
-        result_part_01 += ( idx_packet * depth_array[ idx_packet ] );
+        wl( String.format( "Delay %3d   Risk %6d", delay_time, result_temp ) );
 
-        wl( String.format( "Cought on depth %3d with range %3d (=%5d)", idx_packet, depth_array[ idx_packet ], ( idx_packet * depth_array[ idx_packet ] ) ) );
-      }
+        result_part_02 = delay_time;
 
-      for ( int idx_1 = idx_packet; idx_1 < max_depth; idx_1++ )
-      {
-        if ( ( depth_range[ idx_1 ] == depth_array[ idx_1 ] ) || ( depth_range[ idx_1 ] == 1 ) )
-        {
-          depth_delta[ idx_1 ] *= -1;
-        }
-
-        depth_range[ idx_1 ] += depth_delta[ idx_1 ];
+        break;
       }
     }
 
     wl( "Result Part 1 " + result_part_01 );
     wl( "Result Part 2 " + result_part_02 );
     wl( "" );
+  }
+
+  private static int calcRisk( int[] pDepth, int[] pRange, int[] pDelta, int pMaxDepth, int pDelayTime )
+  {
+    int result_value = 0;
+
+    /*
+     * Resetting the arrays to start position
+     */
+    for ( int idx_1 = 0; idx_1 < pMaxDepth; idx_1++ )
+    {
+      if ( pDepth[ idx_1 ] != 0 )
+      {
+        pRange[ idx_1 ] = 1;
+        pDelta[ idx_1 ] = -1;
+      }
+    }
+
+    /*
+     * Advancing the scanners through the delay time.
+     */
+    for ( int idx_delay = 0; idx_delay < pDelayTime; idx_delay++ )
+    {
+      for ( int idx_1 = 0; idx_1 < pMaxDepth; idx_1++ )
+      {
+        if ( ( pRange[ idx_1 ] == pDepth[ idx_1 ] ) || ( pRange[ idx_1 ] == 1 ) )
+        {
+          pDelta[ idx_1 ] *= -1;
+        }
+
+        pRange[ idx_1 ] += pDelta[ idx_1 ];
+      }
+    }
+
+    /*
+     * Simulating the packet traversing through the scanners
+     */
+    for ( int idx_packet = 0; idx_packet < pMaxDepth; idx_packet++ )
+    {
+      if ( pRange[ idx_packet ] == 1 )
+      {
+        result_value += ( idx_packet * pDepth[ idx_packet ] );
+
+        //wl( String.format( "Cought on depth %3d with range %3d (=%5d)", idx_packet, pDepth[ idx_packet ], ( idx_packet * pDepth[ idx_packet ] ) ) );
+      }
+
+      for ( int idx_1 = idx_packet; idx_1 < pMaxDepth; idx_1++ )
+      {
+        if ( ( pRange[ idx_1 ] == pDepth[ idx_1 ] ) || ( pRange[ idx_1 ] == 1 ) )
+        {
+          pDelta[ idx_1 ] *= -1;
+        }
+
+        pRange[ idx_1 ] += pDelta[ idx_1 ];
+      }
+    }
+
+    return result_value;
   }
 
   private static List< String > getListProd()
