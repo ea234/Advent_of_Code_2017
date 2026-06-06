@@ -121,7 +121,26 @@ class Day20Particle
 
   public boolean checkCollision( Day20Particle pDay20Particle )
   {
+    if ( this.equals( pDay20Particle ) ) return false;
+
     return ( ( m_x_position == pDay20Particle.getXPosition() ) && ( m_y_position == pDay20Particle.getYPosition() ) && ( m_z_position == pDay20Particle.getZPosition() ) );
+  }
+
+  public String getKey()
+  {
+    return "X" + m_x_position + "Y" + Math.abs( m_y_position ) + "Z" + Math.abs( m_z_position );
+  }
+
+  public boolean isMyIndex( String pIndex )
+  {    
+    if ( pIndex == null ) return false;
+    
+    return m_index == Long.valueOf( pIndex );
+  }
+
+  public boolean isNotMyIndex( String pIndex )
+  {    
+    return m_index != Integer.parseInt( pIndex );
   }
 
   public long getXPosition()
