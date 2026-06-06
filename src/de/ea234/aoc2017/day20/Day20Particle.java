@@ -25,10 +25,6 @@ class Day20Particle
 
   long   m_z_acceleration = 0l;
 
-  int    m_tick_index     = 0;
-
-  long[] m_tick_array     = new long[ 200 ];
-
   int    m_index          = 0;
 
   String m_input          = "";
@@ -36,35 +32,39 @@ class Day20Particle
   public Day20Particle( int pIndex, String pInput )
   {
     m_index = pIndex;
+
     m_input = pInput;
 
-    List< Long > list = new ArrayList< Long >();
+    reset();
+  }
 
-    Matcher m = Pattern.compile( "-?\\d+" ).matcher( pInput );
+  public void reset()
+  {
+    List< Long > temp_input_list = new ArrayList< Long >();
 
-    while ( m.find() )
+    Matcher reg_ex_matcher = Pattern.compile( "-?\\d+" ).matcher( m_input );
+
+    while ( reg_ex_matcher.find() )
     {
-      list.add( Long.valueOf( m.group() ) );
+      temp_input_list.add( Long.valueOf( reg_ex_matcher.group() ) );
     }
 
-    long[] input_values = list.stream().mapToLong( long_value -> ( (Long) long_value ).longValue() ).toArray();
+    long[] input_values = temp_input_list.stream().mapToLong( long_value -> ( (Long) long_value ).longValue() ).toArray();
 
     //System.out.println( pInput );
     //System.out.println( java.util.Arrays.toString( input_values ) );
 
-    m_x_position = input_values[ 0 ];
-    m_y_position = input_values[ 1 ];
-    m_z_position = input_values[ 2 ];
+    m_x_position     = input_values[ 0 ];
+    m_y_position     = input_values[ 1 ];
+    m_z_position     = input_values[ 2 ];
 
-    m_x_velocity = input_values[ 3 ];
-    m_y_velocity = input_values[ 4 ];
-    m_z_velocity = input_values[ 5 ];
+    m_x_velocity     = input_values[ 3 ];
+    m_y_velocity     = input_values[ 4 ];
+    m_z_velocity     = input_values[ 5 ];
 
     m_x_acceleration = input_values[ 6 ];
     m_y_acceleration = input_values[ 7 ];
     m_z_acceleration = input_values[ 8 ];
-
-    reset();
   }
 
   public int getIndex()
@@ -75,14 +75,6 @@ class Day20Particle
   public String getInput()
   {
     return m_input;
-  }
-
-  public void reset()
-  {
-    for ( int index = 0; index < m_tick_array.length; index++ )
-    {
-      m_tick_array[ index ] = Long.MAX_VALUE;
-    }
   }
 
   public void doTick()
@@ -116,15 +108,6 @@ class Day20Particle
      * Increase the Z position by the Z velocity.
      */
     m_z_position += m_z_velocity;
-
-    m_tick_index++;
-
-    if ( m_tick_index == m_tick_array.length )
-    {
-      m_tick_index = 0;
-    }
-
-    m_tick_array[ m_tick_index ] = getManhattenDistance();
   }
 
   public long getManhattenDistance()
@@ -136,16 +119,9 @@ class Day20Particle
     return Math.abs( m_x_position ) + Math.abs( m_y_position ) + Math.abs( m_z_position );
   }
 
-  public long getAvgManhattenDistance()
+  public boolean checkCollision( Day20Particle pDay20Particle )
   {
-    long sum_x = 0;
-
-    for ( int index = 0; index < m_tick_array.length; index++ )
-    {
-      sum_x += m_tick_array[ index ];
-    }
-
-    return sum_x / m_tick_array.length;
+    return ( ( m_x_position == pDay20Particle.getXPosition() ) && ( m_y_position == pDay20Particle.getYPosition() ) && ( m_z_position == pDay20Particle.getZPosition() ) );
   }
 
   public long getXPosition()
@@ -153,89 +129,14 @@ class Day20Particle
     return m_x_position;
   }
 
-  public void setXPosition( long pXPosition )
-  {
-    m_x_position = pXPosition;
-  }
-
   public long getYPosition()
   {
     return m_y_position;
   }
 
-  public void setYPosition( long pYPosition )
-  {
-    m_y_position = pYPosition;
-  }
-
   public long getZPosition()
   {
     return m_z_position;
-  }
-
-  public void setZPosition( long pZPosition )
-  {
-    m_z_position = pZPosition;
-  }
-
-  public long getXAcceleration()
-  {
-    return m_x_acceleration;
-  }
-
-  public void setXAcceleration( long pXAcceleration )
-  {
-    m_x_acceleration = pXAcceleration;
-  }
-
-  public long getYAcceleration()
-  {
-    return m_y_acceleration;
-  }
-
-  public void setYAcceleration( long pYAcceleration )
-  {
-    m_y_acceleration = pYAcceleration;
-  }
-
-  public long getZAcceleration()
-  {
-    return m_z_acceleration;
-  }
-
-  public void setZAcceleration( long pZAcceleration )
-  {
-    m_z_acceleration = pZAcceleration;
-  }
-
-  public long getXVelocity()
-  {
-    return m_x_velocity;
-  }
-
-  public void setXVelocity( long pXVelocity )
-  {
-    m_x_velocity = pXVelocity;
-  }
-
-  public long getYVelocity()
-  {
-    return m_y_velocity;
-  }
-
-  public void setYVelocity( long pYVelocity )
-  {
-    m_y_velocity = pYVelocity;
-  }
-
-  public long getZVelocity()
-  {
-    return m_z_velocity;
-  }
-
-  public void setZVelocity( long pZVelocity )
-  {
-    m_z_velocity = pZVelocity;
   }
 
   public String toString()
