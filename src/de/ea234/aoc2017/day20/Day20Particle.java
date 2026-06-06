@@ -25,13 +25,13 @@ class Day20Particle
 
   long   m_z_acceleration = 0l;
 
-  int    m_index          = 0;
+  int    m_id             = 0;
 
   String m_input          = "";
 
-  public Day20Particle( int pIndex, String pInput )
+  public Day20Particle( int pID, String pInput )
   {
-    m_index = pIndex;
+    m_id = pID;
 
     m_input = pInput;
 
@@ -65,16 +65,6 @@ class Day20Particle
     m_x_acceleration = input_values[ 6 ];
     m_y_acceleration = input_values[ 7 ];
     m_z_acceleration = input_values[ 8 ];
-  }
-
-  public int getIndex()
-  {
-    return m_index;
-  }
-
-  public String getInput()
-  {
-    return m_input;
   }
 
   public void doTick()
@@ -119,28 +109,19 @@ class Day20Particle
     return Math.abs( m_x_position ) + Math.abs( m_y_position ) + Math.abs( m_z_position );
   }
 
-  public boolean checkCollision( Day20Particle pDay20Particle )
-  {
-    if ( this.equals( pDay20Particle ) ) return false;
-
-    return ( ( m_x_position == pDay20Particle.getXPosition() ) && ( m_y_position == pDay20Particle.getYPosition() ) && ( m_z_position == pDay20Particle.getZPosition() ) );
-  }
-
   public String getKey()
   {
-    return "X" + m_x_position + "Y" + Math.abs( m_y_position ) + "Z" + Math.abs( m_z_position );
+    return "X" + m_x_position + "Y" + m_y_position + "Z" + m_z_position;
   }
 
-  public boolean isMyIndex( String pIndex )
-  {    
-    if ( pIndex == null ) return false;
-    
-    return m_index == Long.valueOf( pIndex );
+  public boolean isMyID( long pID )
+  {
+    return m_id == pID;
   }
 
-  public boolean isNotMyIndex( String pIndex )
-  {    
-    return m_index != Integer.parseInt( pIndex );
+  public boolean isNotMyID( String pID )
+  {
+    return m_id != Integer.parseInt( pID );
   }
 
   public long getXPosition()
@@ -156,6 +137,16 @@ class Day20Particle
   public long getZPosition()
   {
     return m_z_position;
+  }
+
+  public int getID()
+  {
+    return m_id;
+  }
+
+  public String getInput()
+  {
+    return m_input;
   }
 
   public String toString()
