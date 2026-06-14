@@ -84,40 +84,40 @@ public class Day03_SpiralMemory
 
   public static void main( String[] args )
   {
-    calculate01();
-
-    System.exit( 0 );
-  }
-
-  private static void calculate01()
-  {
-    long result_part_01 = 0;
-
-    long round_nr       = 0;
-
-    long old_value      = 0;
-    long cur_value      = 1;
-
-    long value_add      = 0;
-
-    long grid_left      = 1;
-    long grid_right     = 1;
-    long grid_top       = 1;
-    long grid_bottom    = 1;
-
     Properties prop_mem = new Properties();
 
+    long round_nr    = 0;
+
+    long old_value   = 0;
+    long cur_value   = 1;
+
+    long value_add   = 0;
+
+    long grid_left   = 1;
+    long grid_right  = 1;
+    long grid_top    = 1;
+    long grid_bottom = 1;
+
+    /*
+     * Storing the initial value into the grid
+     */
     String cur_coords = "R" + grid_top + "C" + grid_left;
 
-    prop_mem.setProperty( PREFIX_VALUE_PART_1  + cur_value,  cur_coords );
+    prop_mem.setProperty( PREFIX_VALUE_PART_1  + cur_value, cur_coords );
     prop_mem.setProperty( PREFIX_COORDS_PART_1 + cur_coords, "" + cur_value );
 
     prop_mem.setProperty( PREFIX_COORDS_PART_2 + cur_coords, "" + cur_value );
 
-    while ( ( round_nr < 1000 ) && ( cur_value < 361527 ) )
+    /*
+     * While-Loop to calculate the spiral memory.
+     */
+    while ( ( round_nr < 1000 ) && ( cur_value < VALUE_TO_SEARCH ) )
     {
       /*
        * Expand Right
+       * The right boundary is expanded by 1 to the right (+1).
+       * 
+       * From the bottom left corner to the new bottom right corner.
        */
 
       old_value = cur_value;
@@ -135,6 +135,10 @@ public class Day03_SpiralMemory
 
       /*
        * Expand Top
+       * The top boundary is expanded by 1 to the upper boundary (-1).
+       * The top boundary is expanding by subtracting 1 from the start.
+       * 
+       * From the bottom right corner to the new top right corner.
        */
 
       old_value = cur_value;
@@ -152,6 +156,10 @@ public class Day03_SpiralMemory
 
       /*
        * Expand Left
+       * The left boundary is expanded by 1 to the new left boundary (-1).
+       * The left boundary is expanding by subtracting 1 from the start.
+       * 
+       * From the top right corner to the new top left corner.
        */
 
       old_value = cur_value;
@@ -169,6 +177,9 @@ public class Day03_SpiralMemory
 
       /*
        * Expand down
+       * The bottom boundary is expanded by 1.
+       * 
+       * From the top left corner to the new bottom left corner.
        */
 
       old_value = cur_value;
@@ -184,21 +195,28 @@ public class Day03_SpiralMemory
         break;
       }
 
+      /*
+       * Increasing the round number.
+       */
       round_nr++;
     }
 
+    /*
+     * Get the coordinates where the values are stored.
+     */
     String cur_coords_vx = prop_mem.getProperty( PREFIX_VALUE_PART_1 + VALUE_TO_SEARCH );
-    String cur_coords_v1 = prop_mem.getProperty( PREFIX_VALUE_PART_1 + 1               );
+    String cur_coords_v1 = prop_mem.getProperty( PREFIX_VALUE_PART_1 + 1 );
 
+    /*
+     * Parsing the stored coordinates to get the row and column values.
+     */
     Result coords_value_x = parse( cur_coords_vx );
     Result coords_value_1 = parse( cur_coords_v1 );
-
-    result_part_01 = Math.abs( coords_value_x.row - coords_value_1.row ) + Math.abs( coords_value_x.column - coords_value_1.column );
 
     wl( "" );
     wl( getDebugGrid( PREFIX_COORDS_PART_1, " %3s", prop_mem, -11, -11, 13, 12 ) );
     wl( "" );
-    wl( getDebugGrid( PREFIX_COORDS_PART_2, " %6s", prop_mem,  -4,  -3,  6,  7 ) );
+    wl( getDebugGrid( PREFIX_COORDS_PART_2, " %6s", prop_mem, -4, -3, 6, 7 ) );
     wl( "" );
     wl( "round_nr      " + round_nr );
     wl( "" );
@@ -213,9 +231,15 @@ public class Day03_SpiralMemory
     wl( String.format( "Value 1   Row = %5d , Column = %5d ", coords_value_1.row, coords_value_1.column ) );
     wl( String.format( "          Row = %5d , Column = %5d ", Math.abs( coords_value_x.row - coords_value_1.row ), Math.abs( coords_value_x.column - coords_value_1.column ) ) );
     wl( "" );
-    wl( "Result Part 1 " + result_part_01 );
+
+    /*
+     * Calculating the Manhatten-Distance
+     */
+    wl( "Result Part 1 " + Math.abs( coords_value_x.row - coords_value_1.row ) + Math.abs( coords_value_x.column - coords_value_1.column ) );
     wl( "Result Part 2 " + result_part_02 );
     wl( "" );
+
+    System.exit( 0 );
   }
 
   private static String getDebugGrid( String pPrefix, String pFormat, Properties pProperties, long pFromRow, long pFromCol, long pToRow, long pToCol )
@@ -245,11 +269,15 @@ public class Day03_SpiralMemory
 
       String cur_coords = "R" + pRow + "C" + pCol;
 
-      pProperties.setProperty( PREFIX_VALUE_PART_1  + pCurValue,  cur_coords );
+      pProperties.setProperty( PREFIX_VALUE_PART_1  + pCurValue, cur_coords );
       pProperties.setProperty( PREFIX_COORDS_PART_1 + cur_coords, "" + pCurValue );
 
       if ( result_part_02 == 0 )
       {
+        /*
+         * If the result for part 2 is still 0, calculate the adjacent cell values.
+         */
+        
         long adjacent_cell_values = getAdjacentValues( pProperties, pRow, pCol );
 
         pProperties.setProperty( PREFIX_COORDS_PART_2 + cur_coords, "" + adjacent_cell_values );
@@ -274,6 +302,10 @@ public class Day03_SpiralMemory
 
       if ( result_part_02 == 0 )
       {
+        /*
+         * If the result for part 2 is still 0, calculate the adjacent cell values.
+         */
+
         long adjacent_cell_values = getAdjacentValues( pProperties, pRow, pCol );
 
         pProperties.setProperty( PREFIX_COORDS_PART_2 + cur_coords, "" + adjacent_cell_values );
@@ -286,6 +318,11 @@ public class Day03_SpiralMemory
   private static long getAdjacentValues( Properties pProperties, long pRow, long pCol )
   {
     /*
+     * Similar Challenge
+     * AOC 2020 - Day 11 - Seating System
+     *  
+     * https://adventofcode.com/2020/day/11
+     * 
      * https://github.com/ea234/Advent_of_Code_2020/blob/main/src/day_11__Seating_System.ts
      */
 
@@ -312,9 +349,7 @@ public class Day03_SpiralMemory
 
   private static long getValue( Properties pProp, String pCoords )
   {
-    String value = pProp.getProperty( PREFIX_COORDS_PART_2 + pCoords, "0" );
-
-    return Long.parseLong( value );
+    return Long.parseLong( pProp.getProperty( PREFIX_COORDS_PART_2 + pCoords, "0" ) );
   }
 
   private static void wl( String pString ) // wl = short for "write log"
